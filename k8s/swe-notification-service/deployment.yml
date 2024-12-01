@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swe-notification-service
+  labels:
+    app: swe-notification-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: swe-notification-service
+  template:
+    metadata:
+      labels:
+        app: swe-notification-service
+    spec:
+      containers:
+        - name: swe-notification-service
+          image: 01092002/swe-notification-service:latest
+          imagePullPolicy: Always
+          env:
+            - name: K8S_ENV
+              value: "prod"
+          envFrom:
+            - configMapRef:
+                name: swe-notification-service-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: swe-notification-service
+spec:
+  type: ClusterIP
+  selector:
+    app: swe-notification-service

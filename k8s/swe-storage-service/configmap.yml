@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: swe-storage-service-configmap
+data:
+  APP_NAME: "swe-storage"
+  GRPC_PORT: "7030"
+  MINIO_HOST: "localhost"
+  MINIO_PORT: "9000"
+  MINIO_ACCESS_KEY: "blQ3xwyhmgVSil41otTG"
+  MINIO_SECRET_KEY: "bnlnY6BYVls7BVOIAhj7LUKF5htiTRkJG4RhdMQJ"
+  MINIO_BUCKET_PUBLIC: "swe-public"
+  MINIO_BUCKET_PRIVATE: "swe-private"
+  MINIO_DEFAULT_EXPIRY: "3600"
+  MINIO_USE_SSL: "false"
+  JWT_SECRET: "jwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3t"

@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: swe-notification-service-configmap
+data:
+  APP_NAME: "swe-notification"
+  KAFKA_BROKER: "localhost:9092"
+  KAFKA_CONSUMER_GROUP: "swe-notification"
+  SMTP_HOST: "smtp-mail.outlook.com"
+  SMTP_PORT: "587"
+  SMTP_USERNAME: "annonymous@yopmail.com"
+  SMTP_PASSWORD: "p@ssw0rd"
