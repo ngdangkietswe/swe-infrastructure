@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: kafka
+  name: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - env:
+            - name: CREATE_TOPICS
+              value: debezium_connect_config:1:1:compact,debezium_connect_offsets:1:1:compact,debezium_connect_status:1:1:compact
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: PLAINTEXT://kafka:9092
+            - name: KAFKA_LISTENERS
+              value: PLAINTEXT://0.0.0.0:9092
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: PLAINTEXT:PLAINTEXT
+            - name: ADVERTISED_HOST_NAME
+              value: kafka
+            - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+              value: "true"
+            - name: KAFKA_LOG_RETENTION_HOURS
+              value: "1"
+            - name: LOG_LEVEL
+              value: WARN
+            - name: ZOOKEEPER_CONNECT
+              value: zookeeper:2181
+          image: debezium/kafka:2.5.0.Final
+          livenessProbe:
+            exec:
+              command:
+                - ./bin/kafka-topics.sh
+                - --list
+                - --bootstrap-server
+                - kafka:9092
+            failureThreshold: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: kafka
+          ports:
+            - containerPort: 9092
+              protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+spec:
+  ports:
+    - port: 9092
+      targetPort: 9092
+  selector:
+    app: kafka

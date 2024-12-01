@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  labels:
+    app: minio
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+        - args:
+            - server
+            - --console-address
+            - :9001
+            - /data
+          env:
+            - name: MINIO_ACCESS_KEY
+              value: blQ3xwyhmgVSil41otTG
+            - name: MINIO_SECRET_KEY
+              value: bnlnY6BYVls7BVOIAhj7LUKF5htiTRkJG4RhdMQJ
+          image: minio/minio
+          name: minio
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+            - containerPort: 9001
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data
+              name: minio-storage
+      restartPolicy: Always
+      volumes:
+        - name: minio-storage
+          persistentVolumeClaim:
+            claimName: minio-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+spec:
+  ports:
+    - port: 9000
+      targetPort: 9000
+    - port: 9001
+      targetPort: 9001
+  selector:
+    app: minio
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: minio-storage
+  name: minio-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi

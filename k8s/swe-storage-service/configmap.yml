@@ -6,7 +6,7 @@ metadata:
 data:
   APP_NAME: "swe-storage"
   GRPC_PORT: "7030"
-  MINIO_HOST: "localhost"
+  MINIO_HOST: "minio"
   MINIO_PORT: "9000"
   MINIO_ACCESS_KEY: "blQ3xwyhmgVSil41otTG"
   MINIO_SECRET_KEY: "bnlnY6BYVls7BVOIAhj7LUKF5htiTRkJG4RhdMQJ"

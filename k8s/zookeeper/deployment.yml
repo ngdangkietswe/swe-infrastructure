@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: zookeeper
+  name: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - env:
+            - name: LOG_LEVEL
+              value: WARN
+            - name: SERVER_COUNT
+              value: "1"
+            - name: SERVER_ID
+              value: "1"
+          image: debezium/zookeeper:2.5.0.Final
+          name: zookeeper
+          ports:
+            - containerPort: 2181
+              protocol: TCP
+            - containerPort: 2888
+              protocol: TCP
+            - containerPort: 3888
+              protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+spec:
+  ports:
+    - port: 2181
+      targetPort: 2181
+    - port: 2888
+      targetPort: 2888
+    - port: 3888
+      targetPort: 3888
+  selector:
+    app: zookeeper
