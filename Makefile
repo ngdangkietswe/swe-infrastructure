@@ -1,5 +1,7 @@
 apply-namespace:
 	cd k8s && kubectl apply -f namespace.yml
+delete-namespace:
+	cd k8s && kubectl delete -f namespace.yml
 
 apply-nginx:
 	cd k8s/nginx && kubectl apply -f .
@@ -45,3 +47,9 @@ apply-swe-gateway:
 	cd k8s/swe-gateway-service && kubectl apply -f .
 delete-swe-gateway:
 	cd k8s/swe-gateway-service && kubectl delete -f .
+
+apply-all:
+	./scripts/apply.sh
+
+delete-all:
+	./scripts/delete.sh
