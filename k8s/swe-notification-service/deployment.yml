@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: swe-notification-service
+  namespace: swe-prod
   labels:
     app: swe-notification-service
 spec:
@@ -18,18 +19,23 @@ spec:
         - name: swe-notification-service
           image: 01092002/swe-notification-service:latest
           imagePullPolicy: Always
-          env:
-            - name: K8S_ENV
-              value: "prod"
           envFrom:
             - configMapRef:
                 name: swe-notification-service-configmap
+          ports:
+            - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: swe-notification-service
+  namespace: swe-prod
+  labels:
+    app: swe-notification-service
 spec:
-  type: ClusterIP
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
   selector:
     app: swe-notification-service
