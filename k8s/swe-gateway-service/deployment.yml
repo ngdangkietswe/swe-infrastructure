@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: swe-gateway-service
+  namespace: swe-prod
   labels:
     app: swe-gateway-service
 spec:
@@ -18,9 +19,6 @@ spec:
         - name: swe-gateway-service
           image: 01092002/swe-gateway-service:latest
           imagePullPolicy: Always
-          env:
-            - name: K8S_ENV
-              value: "prod"
           envFrom:
             - configMapRef:
                 name: swe-gateway-service-configmap

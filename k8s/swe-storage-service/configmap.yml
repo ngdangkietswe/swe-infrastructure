@@ -1,10 +1,11 @@
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: swe-storage-service-configmap
+  namespace: swe-prod
 data:
   APP_NAME: "swe-storage"
+  ENV: "prod"
   GRPC_PORT: "7030"
   MINIO_HOST: "minio"
   MINIO_PORT: "9000"

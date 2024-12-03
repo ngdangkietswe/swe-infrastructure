@@ -1,20 +1,22 @@
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: swe-auth-service-configmap
+  namespace: swe-prod
 data:
   APP_NAME: "swe-auth"
-  DB_HOST: "localhost"
+  ENV: "prod"
+  DB_HOST: "<YOUR_DB_HOST>"
   DB_PORT: "5432"
-  DB_USER: "postgres"
-  DB_PASSWORD: "123456"
+  DB_USER: "<YOUR_DB_USER>"
+  DB_PASSWORD: "<YOUR_DB_PASS>"
   DB_NAME: "SweAuth"
+  DB_SSL_MODE: "require"
   GRPC_PORT: "7020"
   JWT_SECRET: "jwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3t"
   JWT_ISSUER: "jwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3r"
-  JWT_EXPIRATION: "3600s"
-  REFRESH_TOKEN_EXPIRATION: "7200s"
-  KAFKA_BROKER: "localhost:9092"
-  REDIS_HOST: "localhost"
+  JWT_EXPIRATION: "3600"
+  REFRESH_TOKEN_EXPIRATION: "7200"
+  KAFKA_BROKERS: "kafka:9092"
+  REDIS_HOST: "redis"
   REDIS_PORT: "6379"

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: swe-storage-service
+  namespace: swe-prod
   labels:
     app: swe-storage-service
 spec:
@@ -18,9 +19,6 @@ spec:
         - name: swe-storage-service
           image: 01092002/swe-storage-service:latest
           imagePullPolicy: Always
-          env:
-            - name: K8S_ENV
-              value: "prod"
           envFrom:
             - configMapRef:
                 name: swe-storage-service-configmap
@@ -31,6 +29,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: swe-storage-service
+  namespace: swe-prod
+  labels:
+    app: swe-storage-service
 spec:
   type: NodePort
   selector:

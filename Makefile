@@ -1,6 +1,11 @@
 apply-namespace:
 	cd k8s && kubectl apply -f namespace.yml
 
+apply-nginx:
+	cd k8s/nginx && kubectl apply -f .
+delete-nginx:
+	cd k8s/nginx && kubectl delete -f .
+
 apply-zookeeper:
 	cd k8s/zookeeper && kubectl apply -f .
 delete-zookeeper:
@@ -16,6 +21,11 @@ apply-minio:
 delete-minio:
 	cd k8s/minio && kubectl delete -f .
 
+apply-redis:
+	cd k8s/redis && kubectl apply -f .
+delete-redis:
+	cd k8s/redis && kubectl delete -f .
+
 apply-swe-notification:
 	cd k8s/swe-notification-service && kubectl apply -f .
 delete-swe-notification:
@@ -25,3 +35,13 @@ apply-swe-storage:
 	cd k8s/swe-storage-service && kubectl apply -f .
 delete-swe-storage:
 	cd k8s/swe-storage-service && kubectl delete -f .
+
+apply-swe-auth:
+	cd k8s/swe-auth-service && kubectl apply -f .
+delete-swe-auth:
+	cd k8s/swe-auth-service && kubectl delete -f .
+
+apply-swe-gateway:
+	cd k8s/swe-gateway-service && kubectl apply -f .
+delete-swe-gateway:
+	cd k8s/swe-gateway-service && kubectl delete -f .

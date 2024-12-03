@@ -1,17 +1,17 @@
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: swe-gateway-service-configmap
+  namespace: swe-prod
 data:
   PORT: "7777"
+  ENV: "prod"
   SWAGGER: "true"
-  GRPC_TASK_HOST: "localhost"
+  GRPC_TASK_HOST: "swe-task-service"
   GRPC_TASK_PORT: "7010"
-  GRPC_AUTH_HOST: "localhost"
+  GRPC_AUTH_HOST: "swe-auth-service"
   GRPC_AUTH_PORT: "7020"
-  GRPC_STORAGE_HOST: "localhost"
+  GRPC_STORAGE_HOST: "swe-storage-service"
   GRPC_STORAGE_PORT: "7030"
   JWT_SECRET: "jwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3t"
   JWT_ISSUER: "jwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3r"
-  JWT_EXPIRATION: "3600s"
