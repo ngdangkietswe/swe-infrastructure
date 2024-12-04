@@ -1,0 +1,204 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:${REDIS_VERSION:-7.2-alpine}
+    container_name: redis
+    ports:
+      - "${REDIS_PORT:-6369}:6379"
+    command: redis-server --loglevel warning
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - swe-prod
+
+  zookeeper:
+    image: debezium/zookeeper:${DEBEZIUM_VERSION:-2.5.0.Final}
+    container_name: zookeeper
+    restart: unless-stopped
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+    environment:
+      SERVER_ID: "1"
+      SERVER_COUNT: "1"
+      LOG_LEVEL: "WARN"
+    networks:
+      - swe-prod
+  
+  kafka:
+    image: debezium/kafka:${DEBEZIUM_VERSION:-2.5.0.Final}
+    container_name: kafka
+    restart: unless-stopped
+    depends_on:
+      zookeeper:
+        condition: service_started
+    ports:
+      - "${KAFKA_PORT:-9092}:9092"
+      - "29092:29092"
+    environment:
+      NODE_ID: "1"
+      BROKER_ID: "1"
+      ZOOKEEPER_CONNECT: "zookeeper:2181"
+      LOG_LEVEL: "WARN"
+      ADVERTISED_HOST_NAME: "kafka"
+      KAFKA_LOG_RETENTION_HOURS: "1"
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "./bin/kafka-topics.sh",
+          "--list",
+          "--bootstrap-server",
+          "kafka:9092"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - swe-prod
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: tchiotludo/akhq:${KAFKA_UI_VERSION:-0.24.0}
+    restart: unless-stopped
+    ports:
+      - "8088:8080"
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "kafka:9092"
+          ui-options:
+            topic-data:
+              sort: NEWEST
+    depends_on:
+      - kafka
+    networks:
+      - swe-prod
+
+  minio:
+    container_name: minio
+    image: minio/minio
+    restart: unless-stopped
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "9001:9001"
+    volumes:
+      - minio-storage:/data
+    environment:
+      MINIO_ACCESS_KEY: blQ3xwyhmgVSil41otTG
+      MINIO_SECRET_KEY: bnlnY6BYVls7BVOIAhj7LUKF5htiTRkJG4RhdMQJ
+    command: server --console-address ":9001" /data
+    networks:
+      - swe-prod
+
+  swe-task-service:
+    container_name: swe-task-service
+    image: 01092002/swe-task-service:${SWE_TASK_SERVICE_VERSION:-latest}
+    restart: unless-stopped
+    networks:
+      - swe-prod
+
+  swe-storage-service:
+    container_name: swe-storage-service
+    image: 01092002/swe-storage-service:${SWE_STORAGE_SERVICE_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "${GRPC_STORAGE_PORT:-7030}:7030"
+    environment:
+      APP_NAME: "swe-storage"
+      ENV: "prod"
+      GRPC_PORT: "${GRPC_STORAGE_PORT:-7030}"
+      MINIO_HOST: "${MINIO_HOST:-minio}"
+      MINIO_PORT: "${MINIO_PORT:-9000}"
+      MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY:-blQ3xwyhmgVSil41otTG}"
+      MINIO_SECRET_KEY: "${MINIO_SECRET_KEY:-bnlnY6BYVls7BVOIAhj7LUKF5htiTRkJG4RhdMQJ}"
+      MINIO_BUCKET_PUBLIC: "${MINIO_BUCKET_PUBLIC:-swe-public}"
+      MINIO_BUCKET_PRIVATE: "${MINIO_BUCKET_PRIVATE:-swe-private}"
+      MINIO_DEFAULT_EXPIRY: "${MINIO_DEFAULT_EXPIRY:-3600}"
+      MINIO_USE_SSL: "${MINIO_USE_SSL:-false}"
+    networks:
+      - swe-prod
+  
+  swe-notification-service:
+    container_name: swe-notification-service
+    image: 01092002/swe-notification-service:${SWE_NOTIFICATION_SERVICE_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "${NOTIFICATION_PORT:-8080}:8080"
+    environment:
+      APP_NAME: "swe-notification"
+      ENV: "prod"
+      KAFKA_BROKERS: "${KAFKA_BROKERS:-kafka:9092}"
+      KAFKA_CONSUMER_GROUP: "${KAFKA_CONSUMER_GROUP:-swe-consumer-group}"
+      SMTP_HOST: "${SMTP_HOST:-smtp-mail.outlook.com}"
+      SMTP_PORT: "${SMTP_PORT:-587}"
+      SMTP_USERNAME: "${SMTP_USERNAME:-annonymous@yopmail.com}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD:-p@ssw0rd}"
+    networks:
+      - swe-prod
+  
+  swe-auth-service:
+    container_name: swe-auth-service
+    image: 01092002/swe-auth-service:${SWE_AUTH_SERVICE_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "${GRPC_AUTH_PORT:-7020}:7020"
+    environment:
+      APP_NAME: "swe-auth"
+      ENV: "prod"
+      DB_HOST: "${DB_HOST:-<YOUR_DB_HOST>}"
+      DB_PORT: "${DB_PORT:-5432}"
+      DB_USER: "${DB_USER:-<YOUR_DB_USER>}"
+      DB_PASSWORD: "${DB_PASSWORD:-<YOUR_DB_PASS>}"
+      DB_NAME: "${DB_NAME:-SweAuth}"
+      DB_SSL_MODE: "${DB_SSL_MODE:-require}"
+      GRPC_PORT: "${GRPC_AUTH_PORT:-7020}"
+      JWT_SECRET: "${JWT_SECRET:-jwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3t}"
+      JWT_ISSUER: "${JWT_ISSUER:-jwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3r}"
+      JWT_EXPIRATION: "${JWT_EXPIRATION:-3600}"
+      REFRESH_TOKEN_EXPIRATION: "${REFRESH_TOKEN_EXPIRATION:-7200}"
+      KAFKA_BROKERS: "${KAFKA_BROKERS:-kafka:9092}"
+      REDIS_HOST: "${REDIS_HOST:-redis}"
+      REDIS_PORT: "${REDIS_PORT:-6379}"
+    networks:
+      - swe-prod
+
+  swe-grpc-gateway:
+    container_name: swe-grpc-gateway
+    image: 01092002/swe-gateway-service:${SWE_GATEWAY_SERVICE_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "${GATEWAY_PORT:-7777}:7777"
+    environment:
+      PORT: "${GATEWAY_PORT:-7777}"
+      ENV: "${ENV:-prod}"
+      SWAGGER: "${SWAGGER:-true}"
+      GRPC_TASK_HOST: "swe-task-service"
+      GRPC_TASK_PORT: "${GRPC_TASK_PORT:-7010}"
+      GRPC_AUTH_HOST: "swe-auth-service"
+      GRPC_AUTH_PORT: "${GRPC_AUTH_PORT:-7020}"
+      GRPC_STORAGE_HOST: "swe-storage-service"
+      GRPC_STORAGE_PORT: "${GRPC_STORAGE_PORT:-7030}"
+      JWT_SECRET: "${JWT_SECRET:-jwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3t}"
+      JWT_ISSUER: "${JWT_ISSUER:-jwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3rjwtissu3r}"
+    networks:
+      - swe-prod
+
+networks:
+  swe-prod:
+    driver: bridge
+
+volumes:
+  minio-storage: { }

@@ -53,3 +53,8 @@ apply-all:
 
 delete-all:
 	./scripts/delete.sh
+
+docker-run:
+	cd docker && docker-compose up -d
+docker-stop:
+	cd docker && docker-compose down
