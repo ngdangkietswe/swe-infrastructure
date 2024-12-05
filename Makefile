@@ -43,6 +43,11 @@ apply-swe-auth:
 delete-swe-auth:
 	cd k8s/swe-auth-service && kubectl delete -f .
 
+apply-swe-task:
+	cd k8s/swe-task-service && kubectl apply -f .
+delete-swe-task:
+	cd k8s/swe-task-service && kubectl delete -f .
+
 apply-swe-gateway:
 	cd k8s/swe-gateway-service && kubectl apply -f .
 delete-swe-gateway:

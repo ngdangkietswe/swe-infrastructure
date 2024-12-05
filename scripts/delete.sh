@@ -22,5 +22,8 @@ make delete-swe-storage
 echo "Deleting swe auth service to k8s cluster..."
 make delete-swe-auth
 
+echo "Deleting swe task service to k8s cluster..."
+make delete-swe-task
+
 echo "Deleting swe gateway service to k8s cluster..."
 make delete-swe-gateway

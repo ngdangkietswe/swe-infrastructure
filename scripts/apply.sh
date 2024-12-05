@@ -22,5 +22,8 @@ make apply-swe-storage
 echo "Applying swe auth service to k8s cluster..."
 make apply-swe-auth
 
+echo "Applying swe task service to k8s cluster..."
+make apply-swe-task
+
 echo "Applying swe gateway service to k8s cluster..."
 make apply-swe-gateway
