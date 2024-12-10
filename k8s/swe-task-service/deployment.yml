@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swe-task-service
-          image: 01092002/swe-task-service:latest
+          image: 01092002/swe-task-service:main-f3edc34-20241210144039
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
