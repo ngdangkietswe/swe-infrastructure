@@ -45,24 +45,24 @@ continuous deployment.
 - To install ArgoCD on an NKE (or any other Kubernetes cluster), you can use the following command:
   
   ```bash
-    make apply-argocd
-    ```
+  make apply-argocd
+  ```
 - After running the installation command, you can verify the deployment by checking the status of the ArgoCD pods:
   
    ```bash
-    kubectl get pods -n argocd
-    ```
+   kubectl get pods -n argocd
+   ```
 - To access the ArgoCD UI, you can use the following command:
   
    ```bash
-    kubectl port-forward svc/argocd-server -n argocd 8080:443
-    ```
+   kubectl port-forward svc/argocd-server -n argocd 8080:443
+   ```
 - You can now access the ArgoCD UI by visiting `http://localhost:8080` in your browser. The default username is `admin`
   and the password is the name of the ArgoCD server pod. You can get the password by running the following command:
   
    ```bash
-    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
-    ```
+   kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+   ```
 - Next, we have to create an App in ArgoCD in which we basically define where is our application’s repository located
   and where to deploy it, and some other small configurations:
   
