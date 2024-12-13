@@ -9,6 +9,10 @@ continuous deployment.
 - [x] [Kubernetes](https://kubernetes.io/)
 - [x] [ArgoCD](https://argoproj.github.io/argo-cd/)
 
+## Diagram
+
+![](assets/pipeline.png)
+
 ## How to run
 
 1. Install [minikube](https://minikube.sigs.k8s.io/docs/start/)
