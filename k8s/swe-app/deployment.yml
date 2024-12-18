@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swe-app
-          image: 01092002/swe-app:latest
+          image: 01092002/swe-app:main-c96d300-20241219002121
           imagePullPolicy: Always
           ports:
             - containerPort: 80
