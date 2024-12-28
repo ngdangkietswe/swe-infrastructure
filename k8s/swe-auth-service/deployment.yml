@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swe-auth-service
-          image: 01092002/swe-auth-service:main-0092364-20241228154139
+          image: 01092002/swe-auth-service:main-2854b95-20241228183809
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
