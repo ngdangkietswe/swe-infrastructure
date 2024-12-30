@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swe-storage-service
-          image: 01092002/swe-storage-service:main-c40b3f5-20241211114626
+          image: 01092002/swe-storage-service:main-b435d28-20241230153829
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
