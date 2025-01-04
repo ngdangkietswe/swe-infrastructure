@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swe-notification-service
-          image: 01092002/swe-notification-service:main-6be3933-20241211114541
+          image: 01092002/swe-notification-service:main-88e4c0e-20250105005342
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
