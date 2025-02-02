@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swe-integration-service
+  namespace: swe-prod
+  labels:
+    app: swe-integration-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: swe-integration-service
+  template:
+    metadata:
+      labels:
+        app: swe-integration-service
+    spec:
+      containers:
+        - name: swe-integration-service
+          image: 01092002/swe-integration-service:main-f8bbb4e-20250202143307
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: swe-integration-service-configmap
+          ports:
+            - containerPort: 7040
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: swe-integration-service
+  namespace: swe-prod
+spec:
+  type: NodePort
+  selector:
+    app: swe-integration-service
+  ports:
+    - name: grpc
+      port: 7040
+      targetPort: 7040
