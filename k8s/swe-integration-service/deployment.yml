@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swe-integration-service
-          image: 01092002/swe-integration-service:main-f8bbb4e-20250202143307
+          image: 01092002/swe-integration-service:main-abf84fe-20250202183933
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
