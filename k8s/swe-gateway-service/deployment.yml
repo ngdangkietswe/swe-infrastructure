@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swe-gateway-service
-          image: 01092002/swe-gateway-service:main-c8d057d-20250202010648
+          image: 01092002/swe-gateway-service:main-c0d48ec-20250218233138
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
