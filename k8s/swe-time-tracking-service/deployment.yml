@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swe-time-tracking-service
+  namespace: swe-prod
+  labels:
+    app: swe-time-tracking-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: swe-time-tracking-service
+  template:
+    metadata:
+      labels:
+        app: swe-time-tracking-service
+    spec:
+      containers:
+        - name: swe-time-tracking-service
+          image: 01092002/swe-time-tracking-service:main-a6a51ee-20241230100438
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: swe-time-tracking-service-configmap
+          ports:
+            - containerPort: 7050
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: swe-time-tracking-service
+  namespace: swe-prod
+  labels:
+    app: swe-time-tracking-service
+spec:
+  type: NodePort
+  selector:
+    app: swe-time-tracking-service
+  ports:
+    - name: grpc
+      port: 7050
+      targetPort: 7050
