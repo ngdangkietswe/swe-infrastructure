@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swe-time-tracking-service
-          image: 01092002/swe-time-tracking-service:main-b148482-20250226172943
+          image: 01092002/swe-time-tracking-service:main-d85bc45-20250227003547
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
