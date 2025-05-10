@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: swe-workflow-service-configmap
+  namespace: swe-prod
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  SERVER_PORT: "7006"
+  GRPC_PORT: "7060"
