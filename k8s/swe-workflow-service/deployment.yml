@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swe-workflow-service
-          image: 01092002/swe-workflow-service:main-latest
+          image: 01092002/swe-workflow-service:main-efd9476-20250511004540
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
