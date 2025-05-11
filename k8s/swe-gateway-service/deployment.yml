@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: swe-gateway-service
-          image: 01092002/swe-gateway-service:main-586aa03-20250511133731
+          image: 01092002/swe-gateway-service:main-d7d76c6-20250511150906
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -38,3 +38,7 @@ spec:
     - name: http
       port: 7777
       targetPort: 7777
+  template:
+    spec:
+      containers:
+        - image: 01092002/swe-gateway-service:main-d7d76c6-20250511150906
