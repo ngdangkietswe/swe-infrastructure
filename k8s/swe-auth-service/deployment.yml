@@ -24,8 +24,6 @@ spec:
                 name: swe-auth-service-configmap
             - secretRef:
                 name: swe-common-secret
-            - secretRef:
-                name: swe-auth-service-secret
           ports:
             - containerPort: 7020
 ---

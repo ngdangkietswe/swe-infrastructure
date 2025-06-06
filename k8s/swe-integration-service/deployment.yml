@@ -22,6 +22,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: swe-integration-service-configmap
+            - secretRef:
+                name: swe-common-secret
+            - secretRef:
+                name: swe-integration-service-secret
           ports:
             - containerPort: 7040
 ---

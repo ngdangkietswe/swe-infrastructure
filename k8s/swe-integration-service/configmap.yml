@@ -6,12 +6,7 @@ metadata:
 data:
   APP_NAME: "swe-integration"
   ENV: "prod"
-  DB_HOST: "YOUR_DB_HOST"
-  DB_PORT: "5432"
-  DB_USER: "YOUR_DB_USER"
-  DB_PASSWORD: "YOUR_DB_PASSWORD"
   DB_NAME: "SweIntegration"
   DB_SSL_MODE: "require"
   DB_SEARCH_PATH: "sweintegration"
   GRPC_PORT: "7040"
-  JWT_SECRET: "jwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3tjwts3cr3t"

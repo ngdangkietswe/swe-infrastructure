@@ -1,6 +1,3 @@
-echo "Deleting namespace to k8s cluster..."
-make delete-namespace
-
 echo "Deleting zookeeper to k8s cluster..."
 make delete-zookeeper
 
@@ -27,3 +24,6 @@ make delete-swe-task
 
 echo "Deleting swe gateway service to k8s cluster..."
 make delete-swe-gateway
+
+echo "Deleting namespace to k8s cluster..."
+make delete-namespace

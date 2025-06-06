@@ -1,68 +1,68 @@
+# Makefile for managing Kubernetes resources, secrets, and Docker containers
+
+# Configurable variables
+K8S_DIR := k8s
+SERVICES := nginx zookeeper kafka minio redis \
+	swe-notification-service swe-storage-service swe-auth-service \
+	swe-task-service swe-gateway-service
+SECRETS := common integration notification
+
+.PHONY: apply-argocd apply-namespace delete-namespace \
+	$(addprefix apply-,$(SERVICES)) \
+	$(addprefix delete-,$(SERVICES)) \
+	$(addprefix create-,$(addsuffix -secret,$(SECRETS))) \
+	apply-all delete-all create-all-secrets \
+	docker-run docker-stop
+
+# --- Argo CD ---
 apply-argocd:
-	kubectl create namespace argocd && kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+	kubectl create namespace argocd || true
+	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
+# --- Namespace ---
 apply-namespace:
-	cd k8s && kubectl apply -f namespace.yml
+	kubectl apply -f $(K8S_DIR)/namespace.yml
+
 delete-namespace:
-	cd k8s && kubectl delete -f namespace.yml
+	kubectl delete -f $(K8S_DIR)/namespace.yml
 
-apply-nginx:
-	cd k8s/nginx && kubectl apply -f .
-delete-nginx:
-	cd k8s/nginx && kubectl delete -f .
+# --- Apply/Delete Service Definitions ---
+define APPLY_SERVICE_template
+apply-$(1):
+	cd $(K8S_DIR)/$(1) && kubectl apply -f .
+endef
 
-apply-zookeeper:
-	cd k8s/zookeeper && kubectl apply -f .
-delete-zookeeper:
-	cd k8s/zookeeper && kubectl delete -f .
+define DELETE_SERVICE_template
+delete-$(1):
+	cd $(K8S_DIR)/$(1) && kubectl delete -f .
+endef
 
-apply-kafka:
-	cd k8s/kafka && kubectl apply -f .
-delete-kafka:
-	cd k8s/kafka && kubectl delete -f .
+$(foreach svc,$(SERVICES),$(eval $(call APPLY_SERVICE_template,$(svc))))
+$(foreach svc,$(SERVICES),$(eval $(call DELETE_SERVICE_template,$(svc))))
 
-apply-minio:
-	cd k8s/minio && kubectl apply -f .
-delete-minio:
-	cd k8s/minio && kubectl delete -f .
+# --- Secret Management ---
+define CREATE_SECRET_template
+create-$(1)-secret:
+	cd $(K8S_DIR)/secret && bash $(1).sh
+endef
 
-apply-redis:
-	cd k8s/redis && kubectl apply -f .
-delete-redis:
-	cd k8s/redis && kubectl delete -f .
+$(foreach s,$(SECRETS),$(eval $(call CREATE_SECRET_template,$(s))))
 
-apply-swe-notification:
-	cd k8s/swe-notification-service && kubectl apply -f .
-delete-swe-notification:
-	cd k8s/swe-notification-service && kubectl delete -f .
+create-all-secrets: $(addprefix create-,$(addsuffix -secret,$(SECRETS)))
 
-apply-swe-storage:
-	cd k8s/swe-storage-service && kubectl apply -f .
-delete-swe-storage:
-	cd k8s/swe-storage-service && kubectl delete -f .
+# --- All apply/delete ---
+apply-all: apply-namespace create-all-secrets $(addprefix apply-,$(SERVICES))
 
-apply-swe-auth:
-	cd k8s/swe-auth-service && kubectl apply -f .
-delete-swe-auth:
-	cd k8s/swe-auth-service && kubectl delete -f .
+delete-all: $(addprefix delete-,$(SERVICES)) delete-namespace
 
-apply-swe-task:
-	cd k8s/swe-task-service && kubectl apply -f .
-delete-swe-task:
-	cd k8s/swe-task-service && kubectl delete -f .
+delete-all-pods:
+	kubectl delete pods --all --all-namespaces
 
-apply-swe-gateway:
-	cd k8s/swe-gateway-service && kubectl apply -f .
-delete-swe-gateway:
-	cd k8s/swe-gateway-service && kubectl delete -f .
-
-apply-all:
-	./scripts/apply.sh
-
-delete-all:
-	./scripts/delete.sh
-
+# --- Docker Helpers (customize as needed) ---
 docker-run:
-	cd docker && docker-compose up -d
+	@echo "Starting Docker containers..."
+	# docker-compose up -d
+
 docker-stop:
-	cd docker && docker-compose down
+	@echo "Stopping Docker containers..."
+	# docker-compose down

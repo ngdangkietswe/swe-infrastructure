@@ -10,5 +10,3 @@ data:
   KAFKA_CONSUMER_GROUP: "swe-consumer-group"
   SMTP_HOST: "smtp-mail.outlook.com"
   SMTP_PORT: "587"
-  SMTP_USERNAME: "annonymous@yopmail.com"
-  SMTP_PASSWORD: "p@ssw0rd"

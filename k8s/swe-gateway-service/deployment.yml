@@ -17,11 +17,13 @@ spec:
     spec:
       containers:
         - name: swe-gateway-service
-          image: 01092002/swe-gateway-service:main-838fd7d-20250529224750
+          image: 01092002/swe-gateway-service:main-97830be-20250606233344
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: swe-gateway-service-configmap
+            - secretRef:
+                name: swe-common-secret
           ports:
             - containerPort: 7777
 ---

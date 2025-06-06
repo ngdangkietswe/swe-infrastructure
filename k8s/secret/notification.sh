@@ -3,16 +3,16 @@
 set -e
 
 NAMESPACE="swe-prod"
-SECRET_NAME="swe-common-secret"
+SECRET_NAME="swe-notification-service-secret"
 
 echo "------------------------------------------------------------"
-echo "SWE Common Secret Manager"
+echo "SWE Notification Service Secret Manager"
 echo "------------------------------------------------------------"
 
-# Confirm deletion of existing secret
+# Confirm deletion of the existing secret
 printf "You are about to delete the Kubernetes secret '%s' in namespace '%s'.\n" "$SECRET_NAME" "$NAMESPACE"
 # shellcheck disable=SC2039
-read -rp "Are you sure you want to proceed? [y/N]: " confirm
+read -rp "Are you sure you want to continue? [y/N]: " confirm
 if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
   echo "Operation cancelled by user."
   exit 0
@@ -22,7 +22,7 @@ echo "🔄 Deleting existing secret '$SECRET_NAME'..."
 kubectl delete secret "$SECRET_NAME" -n "$NAMESPACE" --ignore-not-found
 echo "✅ Secret deleted successfully."
 
-# Function to prompt for a non-empty input
+# Function to prompt for a required non-empty input
 prompt_required_input() {
   # shellcheck disable=SC2039
   local var_name="$1"
@@ -42,42 +42,21 @@ prompt_required_input() {
   eval "$var_name=\$input_value"
 }
 
-# Prompt for secret values
-prompt_required_input DB_HOST "Enter the database host"
-prompt_required_input DB_PORT "Enter the database port"
-prompt_required_input DB_USER "Enter the database username"
+# Collect new secret values
+prompt_required_input SMTP_USERNAME "Enter the SMTP username"
 
-# Silent prompt for password
-while [ -z "$DB_PASSWORD" ]; do
+while [ -z "$SMTP_PASSWORD" ]; do
   # shellcheck disable=SC2039
-  read -rsp "Enter the database password: " DB_PASSWORD
+  read -rsp "Enter the SMTP password: " SMTP_PASSWORD
   echo
-  [ -z "$DB_PASSWORD" ] && echo "⚠️  Password cannot be empty. Please try again."
+  [ -z "$SMTP_PASSWORD" ] && echo "⚠️  SMTP password cannot be empty. Please try again."
 done
 
-while [ -z "$JWT_SECRET" ]; do
-  # shellcheck disable=SC2039
-  read -rsp "Enter the JWT secret: " JWT_SECRET
-  echo
-  [ -z "$JWT_SECRET" ] && echo "⚠️  JWT secret cannot be empty. Please try again."
-done
-
-while [ -z "$JWT_ISSUER" ]; do
-  # shellcheck disable=SC2039
-  read -rsp "Enter the JWT issuer: " JWT_ISSUER
-  echo
-  [ -z "$JWT_ISSUER" ] && echo "⚠️  JWT issuer cannot be empty. Please try again."
-done
-
-# Create new Kubernetes secret
+# Create the secret
 echo "🔐 Creating secret '$SECRET_NAME' in namespace '$NAMESPACE'..."
 kubectl create secret generic "$SECRET_NAME" -n "$NAMESPACE" \
-  --from-literal=DB_HOST="$DB_HOST" \
-  --from-literal=DB_PORT="$DB_PORT" \
-  --from-literal=DB_USER="$DB_USER" \
-  --from-literal=DB_PASSWORD="$DB_PASSWORD" \
-  --from-literal=JWT_SECRET="$JWT_SECRET" \
-  --from-literal=JWT_ISSUER="$JWT_ISSUER"
+  --from-literal=SMTP_USERNAME="$SMTP_USERNAME" \
+  --from-literal=SMTP_PASSWORD="$SMTP_PASSWORD"
 echo "✅ Secret '$SECRET_NAME' created successfully."
 
 # Show the decoded secret data
@@ -85,6 +64,6 @@ echo "📦 Retrieving and decoding secret values:"
 kubectl get secret "$SECRET_NAME" -n "$NAMESPACE" -o json | jq -r '.data | map_values(@base64d)'
 
 echo "------------------------------------------------------------"
-echo "SWE Common secret setup completed successfully."
-echo "You can now use this secret in your Kubernetes deployments."
+echo "SWE Notification Service secret setup completed successfully."
+echo "You can now use the secret in your Kubernetes deployments."
 echo "------------------------------------------------------------"
